@@ -67,21 +67,21 @@ html,body{
 	vertical-align: middle;
 }
 .wrapper .top-nav-wrap .top-nav .bg-pic.xsj-pic{
-	background-image: url('/Users/dong/Documents/GitHub/html/img/xsj.png');
+	background-image: url('./img/xsj.png');
 }
 .wrapper .top-nav-wrap .top-nav .bg-pic.shopCar-pic{
-	background-image: url('/Users/dong/Documents/GitHub/html/img/shopCar.png');
+	background-image: url('./img/shopCar.png');
 	background-size: 100% 100%;
 	width: 13px;
 	height: 13px;
 }
 .wrapper .top-nav-wrap .top-nav .like-pic{
-	background-image: url('/Users/dong/Documents/GitHub/html/img/star.png');
+	background-image: url('./img/star.png');
 	width: 10px;
 	height: 10px;
 }
 .wrapper .top-nav-wrap .top-nav .bg-pic.web-nav-pic{
-	background-image: url('/Users/dong/Documents/GitHub/html/img/web-nav.png');
+	background-image: url('./img/web-nav.png');
 	width: 11px;
 	height: 11px;
 }

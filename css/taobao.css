@@ -11,6 +11,7 @@ html,body{
 	background-color: #f4f4f4;
 	/*横行滚动条消失，超出部分隐藏*/
 	overflow-x: hidden;
+	border: 1px solid blue;
 }
 .wrapper{
 	width: 100%;

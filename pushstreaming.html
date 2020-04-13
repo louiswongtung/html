@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<!-- 20190719 by dong.huang@net263.com -->
+<!-- 20190725 by dong.huang@net263.com -->
+<!-- 20191011 by dong.huang@net263.com -->
+<!-- 20203023 by dong.huang@net263.com :return rtmp/hls resouce link-->
+
+<head>
+  <title>获取推拉流地址</title>
+  <meta charset="UTF-8">
+<script src="http://static.gensee.com/webcast/static/sdk/js/jquery-1.9.1.min.js"></script>
+<script src="https://cdn.staticfile.org/clipboard.js/1.5.15/clipboard.min.js"></script>
+<script>
+
+$(document).ready(function(){
+      // 获取推流地址
+    $("#push").click(function(){
+       var ctxid,
+           site = document.getElementById("url").value, //声明site并赋值站点地址
+           ctx = document.getElementById("ctx").value,  //声明ctx并赋值服务类型
+           id = document.getElementById("webcastId").value;  //声明id并赋值直播id
+           switch (document.getElementById("ctx").value) {
+            default:
+          ctxid = "webcastId";
+          break;
+            case "training":
+          ctxid = "roomId";
+            break;
+        }
+        if(site && id !== "" ){ //判断站点、直播id值,任意一项为空则不执行以下请求   
+          $.post("http://" + site + "/integration/site/" + ctx + "/stream/push/info?" + ctxid + "=" + id + "",
+        function(data){
+        //返回请求结果到页面
+          var results = JSON.parse(data); //从JSON字符串转为对象
+            if(results.hasOwnProperty('address')){
+              document.getElementById("txtHint").innerHTML = results.address;
+            }else{
+          document.getElementById("txtHint").innerHTML = data;
+        }
+      });
+      }else{
+          //判断站点或直播id值为空给出提示
+          document.getElementById("txtHint").innerHTML =  "请输入站点地址和直播ID!";
+        }
+   });
+
+  // 获取RTMP/HLS拉流地址
+  $("#pull").click(function(){
+      var ctxid,
+           site = document.getElementById("url").value, //声明site并赋值站点地址
+           ctx = document.getElementById("ctx").value,  //声明ctx并赋值服务类型
+           id = document.getElementById("webcastId").value;  //声明id并赋值直播id
+           switch (document.getElementById("ctx").value) {
+            default:
+          ctxid = "webcastId";
+          break;
+            case "training":
+          ctxid = "roomId";
+            break;
+        }
+        if(site && id !== "" ){//判断站点、直播id值,任意一项为空则不执行以下请求  
+          $.get("http://" + site + "/integration/site/" + ctx + "/stream/pull/info?" + ctxid + "=" + id +"",
+         function(data){
+
+            var results = JSON.parse(data);//从JSON字符串转为对象
+              if(results.hasOwnProperty('address')){
+                // document.getElementById("txtHint").innerHTML = results.address;
+                var getRt = results.address + '&jsonp=true';
+                  $.ajax({
+                            url: getRt,
+                            dataType: "jsonp",
+                            jsonp: "callback",
+                            success: function () {
+                        console.log()
+                       }
+                  });
+                   }else{
+                document.getElementById("txtHint").innerHTML = data;
+              }
+         });
+       }else{document.getElementById("txtHint").innerHTML =  "请输入站点地址和直播ID!";}
+  });
+    
+
+
+  // 获取固定拉流地址
+  $("#pull-static").click(function(){
+    var ctxid,
+           site = document.getElementById("url").value, //声明site并赋值站点地址
+           ctx = document.getElementById("ctx").value,  //声明ctx并赋值服务类型
+           id = document.getElementById("webcastId").value;  //声明id并赋值直播id
+           switch (document.getElementById("ctx").value) {
+            default:
+          ctxid = "webcastId";
+          break;
+            case "training":
+          ctxid = "roomId";
+            break;
+        }
+      if(site && id !== "" ){ //判断站点、直播id值,任意一项为空则不执行以下请求    
+        $.get("http://" + site + "/integration/site/" + ctx + "/stream/pull/info?" + ctxid + "=" + id +"&mode=redirect",
+      function(data){
+        var results = JSON.parse(data);//从JSON字符串转为对象
+          if(results.hasOwnProperty('address')){
+            document.getElementById("txtHint").innerHTML = results.address;
+          }else{
+      document.getElementById("txtHint").innerHTML = data;
+      }
+    });
+    }else{
+        //判断站点或直播id值为空给出提示
+        document.getElementById("txtHint").innerHTML =  "请输入站点地址和直播ID!";
+      }
+  });
+});
+
+      //处理获取rtmp二次请求结果并返回
+       function pingresult(result){
+          if (result.result.value == "0"){
+              var rtmpVideo = result.result.streams.rtmp,
+                  rtmpAudio = result.result.streams.audioonlyrtmp,
+                  hlsVideo = result.result.streams.hls,
+                  hlsAudio = result.result.streams.audioonlyhls,
+                  result_print_string=' <b>rtmp视频:</b>' + " " + rtmpVideo +'<br/><b>rtmp音频:</b>'+ " "+rtmpAudio+'<br/><b>hls视频:</b>'+ " "+hlsVideo+'<br/><b>hls音频:<b>'+ " "+hlsAudio;
+            $("#txtHint").html(result_print_string);
+          }else{
+      $("#txtHint").html("获取rtmp拉流地址失败，请确认直播是否处于开启状态！");
+  }
+  };
+
+
+      //请求结果复制功能
+      function copyFn() {
+        var content = $("#txtHint").html();
+          if(content == null || content.length == 0){
+            alert("结果为空，复制不鸟呀");
+          }
+          else{
+            var val = document.getElementById('txtHint');
+            window.getSelection().selectAllChildren(val);
+            document.execCommand("Copy");
+            alert("结果已复制，可贴粘。");
+          }
+      }
+
+</script>
+
+</head>
+<h1 align="center">获取推拉流地址</h1>
+<body>
+<div>
+  <p>站点地址： <input id="url" type="text"   style="width:300px" name="url" value=""  /> 示例: xxxxx.gensee.com </p>
+  <p>直播ID： <input id="webcastId" type="text"   style="width:300px" name="webcastId" value="" /> 示例: 232689a3ecc14e77bee2b6aab62331f9或 x017ViRe6a</p>
+  <p>
+            <label for="ctx">服务类型：</label>
+            <select name="ctx" id="ctx">
+              <option value="webcast">webcast</option>
+              <option value="training">training</option>
+            </select>
+  </p>
+</div>
+<button id = "push" class="sub">获取推流地址</button>
+<br>
+<br>
+<button id = "pull" class="sub">获取RTMP/HLS拉流地址</button>
+<button id = "pull-static" class="sub">获取固定拉流地址</button>
+<br>
+<br>
+<br>
+<h4>请求结果将在此处列出：<h4>
+<div id="txtHint" style="border:1px solid #000;height: 100px;width: 1280px;word-break: break-all;white-space: normal;"></div><br>
+<button onClick="copyFn()">复制结果</button>
+<h3></h3>
+
+</div>
+
+
+</body>
+</html>
